@@ -3,9 +3,11 @@ node_modules/
 data/*.db
 data/*.db-journal
 data/*.db-wal
+data/*.db-shm
 *.db
 *.db-journal
 *.db-wal
+*.db-shm
 .cursor/
 dist/
 .DS_Store
