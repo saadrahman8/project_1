@@ -1,0 +1,7 @@
+node_modules
+.git
+.cursor
+*.db-journal
+*.db-wal
+.env
+.DS_Store

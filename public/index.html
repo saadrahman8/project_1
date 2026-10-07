@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ARCHON Fitness | Privacy-First Activity Leaderboard & Analytics</title>
+  <meta name="description" content="Privacy-first fitness leaderboard with discrete improvement tracking, ratio analytics, shadow ranking, and custom admin activities.">
+  
+  <!-- Modern Typography from Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="theme-dark">
+  <!-- Toast Container -->
+  <div id="toastContainer" class="toast-container" aria-live="polite"></div>
+
+  <!-- Top Announcement / Quick Demo Switcher Bar -->
+  <aside class="demo-bar" aria-label="Demo Quick Switcher">
+    <div class="demo-bar-inner">
+      <div class="demo-badge">
+        <span class="pulse-dot"></span>
+        <strong>Interactive Demo Mode:</strong> Quick login switch
+      </div>
+      <div class="demo-quick-buttons">
+        <button class="btn-demo" data-user="abc" title="User with private logs who is #8 on personal board and hidden from public">
+          🔒 <strong>User ABC</strong> (Rank #8 Private Demo)
+        </button>
+        <button class="btn-demo" data-user="henry_fit" title="User who is #8 on the public board">
+          🏃 <strong>Henry</strong> (Public Rank #8)
+        </button>
+        <button class="btn-demo" data-user="elena_pro" title="Rank #1 Athlete">
+          🥇 <strong>Elena</strong> (#1 Athlete)
+        </button>
+        <button class="btn-demo" data-user="admin" title="Admin with custom activity creation capabilities">
+          👑 <strong>Admin</strong> (Activity Creator)
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Navigation Bar -->
+  <header class="app-header">
+    <div class="header-inner">
+      <div class="brand">
+        <div class="brand-icon">⚡</div>
+        <div class="brand-text">
+          <span class="brand-title">ARCHON</span>
+          <span class="brand-sub">FITNESS LEADERBOARD</span>
+        </div>
+      </div>
+
+      <nav class="nav-links" id="mainNav">
+        <button class="nav-tab active" data-view="leaderboard">
+          <span class="tab-icon">🏆</span> Leaderboard
+        </button>
+        <button class="nav-tab" data-view="compare">
+          <span class="tab-icon">⚖️</span> Compare Users
+        </button>
+        <button class="nav-tab" data-view="logs" id="myLogsTab">
+          <span class="tab-icon">📝</span> My Workouts
+        </button>
+        <button class="nav-tab admin-only hidden" data-view="admin" id="adminNavTab">
+          <span class="tab-icon">👑</span> Admin Console
+        </button>
+        <button class="nav-tab" data-view="guide">
+          <span class="tab-icon">💡</span> How It Works
+        </button>
+      </nav>
+
+      <div class="user-controls" id="userControls">
+        <!-- Injected via state.js (Login/Register buttons or User Badge + Logout) -->
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="main-content" id="mainContent">
+    <!-- View containers dynamically rendered -->
+    <div id="viewContainer" class="view-container">
+      <!-- Loading skeleton placeholder -->
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <p>Loading Archon fitness telemetry...</p>
+      </div>
+    </div>
+  </main>
+
+  <!-- Auth Modal -->
+  <div id="authModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="authModalTitle">
+    <div class="modal-card">
+      <button class="modal-close" id="closeAuthModal" aria-label="Close modal">&times;</button>
+      
+      <div class="auth-tabs">
+        <button class="auth-tab-btn active" id="tabLoginBtn">Sign In</button>
+        <button class="auth-tab-btn" id="tabRegisterBtn">Create Account</button>
+      </div>
+
+      <!-- Login Form -->
+      <form id="loginForm" class="auth-form">
+        <h2 id="authModalTitle" class="modal-title">Welcome Back</h2>
+        <p class="modal-subtitle">Sign in to log workouts and view your personal shadow rank.</p>
+
+        <div class="form-group">
+          <label for="loginIdentifier">Username or Email</label>
+          <input type="text" id="loginIdentifier" required placeholder="e.g. abc or admin" autocomplete="username">
+        </div>
+
+        <div class="form-group">
+          <label for="loginPassword">Password</label>
+          <input type="password" id="loginPassword" required placeholder="••••••••" autocomplete="current-password">
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block">Sign In</button>
+
+        <div class="auth-quick-hint">
+          <span>Tip: Default password for all demo accounts is: <code>Password123!</code> (Admin: <code>Admin123!</code>)</span>
+        </div>
+      </form>
+
+      <!-- Register Form -->
+      <form id="registerForm" class="auth-form hidden">
+        <h2 class="modal-title">Create Account</h2>
+        <p class="modal-subtitle">Join the fitness competition with full privacy control.</p>
+
+        <div class="form-group">
+          <label for="regDisplayName">Full / Display Name</label>
+          <input type="text" id="regDisplayName" required placeholder="e.g. Alex Morgan">
+        </div>
+
+        <div class="form-group">
+          <label for="regUsername">Username</label>
+          <input type="text" id="regUsername" required placeholder="e.g. alex_fitness" autocomplete="username">
+        </div>
+
+        <div class="form-group">
+          <label for="regEmail">Email Address</label>
+          <input type="email" id="regEmail" required placeholder="alex@example.com" autocomplete="email">
+        </div>
+
+        <div class="form-group">
+          <label for="regPassword">Password (min 6 characters)</label>
+          <input type="password" id="regPassword" required placeholder="••••••••" minlength="6" autocomplete="new-password">
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block">Create Account</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Edit Log Modal -->
+  <div id="editLogModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="editLogTitle">
+    <div class="modal-card">
+      <button class="modal-close" id="closeEditModal" aria-label="Close modal">&times;</button>
+      <h2 id="editLogTitle" class="modal-title">Edit Workout Record</h2>
+      <p class="modal-subtitle">Update your score. Only you have permission to edit this record.</p>
+
+      <form id="editLogForm" class="workout-form">
+        <input type="hidden" id="editLogId">
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="editDistance">Distance (km)</label>
+            <input type="number" id="editDistance" step="0.1" min="0" required>
+          </div>
+          <div class="form-group">
+            <label for="editDuration">Duration (minutes)</label>
+            <input type="number" id="editDuration" min="1" required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="editDate">Date</label>
+            <input type="date" id="editDate" required>
+          </div>
+          <div class="form-group">
+            <label for="editCalories">Calories (optional)</label>
+            <input type="number" id="editCalories" min="0" placeholder="Auto-calculated">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="editNotes">Notes / Description</label>
+          <input type="text" id="editNotes" placeholder="Route, feelings, pace notes...">
+        </div>
+
+        <div class="form-group privacy-toggle-box">
+          <label class="toggle-switch-label" for="editIsPrivate">
+            <input type="checkbox" id="editIsPrivate" class="toggle-checkbox">
+            <span class="toggle-slider"></span>
+            <div class="toggle-text">
+              <strong>🔒 Private Workout</strong>
+              <small>Only visible to you. Excluded from public board, counted in personal rank.</small>
+            </div>
+          </label>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn btn-ghost" id="cancelEditBtn">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="app-footer">
+    <div class="footer-inner">
+      <p>ARCHON Fitness Engine &copy; 2026 &bull; Zero Paid Technologies &bull; Secure SQLite &bull; Open-Source Architecture</p>
+      <div class="footer-links">
+        <span>Privacy-Preserving Leaderboards</span>
+        <span>Discrete Delta Analytics</span>
+        <span>HCI Usability Guidelines</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="/js/api.js"></script>
+  <script src="/js/state.js"></script>
+  <script src="/js/views/leaderboardView.js"></script>
+  <script src="/js/views/comparisonView.js"></script>
+  <script src="/js/views/logsView.js"></script>
+  <script src="/js/views/adminView.js"></script>
+  <script src="/js/views/guideView.js"></script>
+  <script src="/js/app.js"></script>
+</body>
+</html>
